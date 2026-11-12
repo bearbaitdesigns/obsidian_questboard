@@ -1,0 +1,9 @@
+{
+  "id": "quests-of-tasklandia",
+  "name": "Quests of Tasklandia",
+  "version": "3.11.1",
+  "minAppVersion": "1.4.0",
+  "description": "A fantasy-themed, gamified chore and task list. Create a hero, take quests from the board, keep up your dailies, tame pets, gear up and defeat an escalating line of bosses on the road to level 100.",
+  "author": "bearbaitdesigns",
+  "isDesktopOnly": false
+}
