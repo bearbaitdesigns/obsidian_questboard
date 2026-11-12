@@ -1,9 +1,11 @@
 name: Release Obsidian plugin
 
+# Runs on every push to main. If manifest.json has a version with no release yet,
+# it creates a release (and tag) with main.js, manifest.json and styles.css, which is what BRAT installs.
 on:
   push:
-    tags:
-      - "*"
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,14 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check tag matches manifest version
-        run: |
-          v=$(node -p "require('./manifest.json').version")
-          if [ "$v" != "${GITHUB_REF_NAME}" ]; then echo "Tag ${GITHUB_REF_NAME} does not match manifest version $v"; exit 1; fi
-      - name: Create release
+      - name: Create release for the manifest version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" main.js manifest.json styles.css \
-            --title "${GITHUB_REF_NAME}" \
-            --notes "Quests of Tasklandia ${GITHUB_REF_NAME}. Install with BRAT: bearbaitdesigns/obsidian_questboard"
+          v=$(node -p "require('./manifest.json').version")
+          if gh release view "$v" >/dev/null 2>&1; then
+            echo "Release $v already exists, nothing to do."
+            exit 0
+          fi
+          gh release create "$v" main.js manifest.json styles.css \
+            --target "$GITHUB_SHA" \
+            --title "$v" \
+            --notes "Quests of Tasklandia $v. Install with BRAT: bearbaitdesigns/obsidian_questboard"
